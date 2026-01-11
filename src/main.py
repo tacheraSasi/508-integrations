@@ -1,5 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Any
 
 import structlog
@@ -152,6 +153,15 @@ async def health_check() -> dict[str, Any]:
     return {
         "status": "healthy" if espocrm_status else "degraded",
         "espocrm": "connected" if espocrm_status else "disconnected",
+        "version": "0.1.0",
+    }
+
+
+@app.get("/ping")
+async def ping() -> dict[str, Any]:
+    return {
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
         "version": "0.1.0",
     }
 
