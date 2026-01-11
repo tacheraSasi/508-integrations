@@ -1,6 +1,6 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 import structlog
@@ -13,6 +13,8 @@ from .crm.processor import ContactSkillsProcessor
 from .crm.skills_extractor import SkillsExtractor
 from .models import EspoCRMWebhookPayload
 from .settings import settings
+
+VERSION = "0.1.0"
 
 structlog.configure(
     processors=[
@@ -53,7 +55,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     title="508 Integrations",
     description="Integration service for EspoCRM webhooks with resume skills extraction",
-    version="0.1.0",
+    version=VERSION,
     lifespan=lifespan,
 )
 
@@ -155,7 +157,7 @@ async def health_check() -> dict[str, Any]:
     return {
         "status": "healthy" if espocrm_status else "degraded",
         "espocrm": "connected" if espocrm_status else "disconnected",
-        "version": "0.1.0",
+        "version": VERSION,
     }
 
 
@@ -211,8 +213,8 @@ async def extract_dry_run(
 async def ping() -> dict[str, Any]:
     return {
         "status": "ok",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
-        "version": "0.1.0",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "version": VERSION,
     }
 
 
@@ -220,7 +222,7 @@ async def ping() -> dict[str, Any]:
 async def root() -> dict[str, str]:
     return {
         "message": "508 Integrations Service",
-        "version": "0.1.0",
+        "version": VERSION,
         "docs": "/docs",
     }
 
